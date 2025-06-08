@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PdfTemplateCLI", "PdfTemplateCLI\PdfTemplateCLI.csproj", "{1054D0B5-8454-47A8-93FA-E031753A0B66}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PdfTemplateCLI", "PdfTemplateCLI", "{D83BAE5F-BD66-438D-AA29-30FF0873F578}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PdfTemplateCLI.Tests", "PdfTemplateCLI\PdfTemplateCLI.Tests\PdfTemplateCLI.Tests.csproj", "{E0584766-7A3D-4E96-943E-21EBEDC62525}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1054D0B5-8454-47A8-93FA-E031753A0B66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1054D0B5-8454-47A8-93FA-E031753A0B66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1054D0B5-8454-47A8-93FA-E031753A0B66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1054D0B5-8454-47A8-93FA-E031753A0B66}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0584766-7A3D-4E96-943E-21EBEDC62525}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0584766-7A3D-4E96-943E-21EBEDC62525}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0584766-7A3D-4E96-943E-21EBEDC62525}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0584766-7A3D-4E96-943E-21EBEDC62525}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1054D0B5-8454-47A8-93FA-E031753A0B66} = {D83BAE5F-BD66-438D-AA29-30FF0873F578}
+		{E0584766-7A3D-4E96-943E-21EBEDC62525} = {D83BAE5F-BD66-438D-AA29-30FF0873F578}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,53 @@
+INFORME MÉDICO
+
+DATOS DEL PACIENTE
+Nombre: {{nombre_paciente}}
+RUT/ID: {{rut_paciente}}
+Edad: {{edad}} años
+Sexo: {{sexo}}
+Fecha de nacimiento: {{fecha_nacimiento}}
+
+DATOS DEL MÉDICO
+Dr(a). {{nombre_medico}}
+Especialidad: {{especialidad}}
+Registro Médico: {{registro_medico}}
+
+FECHA DE CONSULTA: {{fecha_consulta}}
+
+MOTIVO DE CONSULTA
+{{motivo_consulta}}
+
+ANAMNESIS
+{{anamnesis}}
+
+EXAMEN FÍSICO
+- Presión arterial: {{presion_arterial}}
+- Frecuencia cardíaca: {{frecuencia_cardiaca}} lpm
+- Temperatura: {{temperatura}}°C
+- Peso: {{peso}} kg
+- Altura: {{altura}} cm
+- IMC: {{imc}}
+
+HALLAZGOS CLÍNICOS
+{{hallazgos_clinicos}}
+
+DIAGNÓSTICO
+Principal: {{diagnostico_principal}}
+Secundarios: {{diagnosticos_secundarios}}
+
+PLAN DE TRATAMIENTO
+{{plan_tratamiento}}
+
+MEDICACIÓN PRESCRITA
+{{medicacion}}
+
+RECOMENDACIONES
+{{recomendaciones}}
+
+PRÓXIMO CONTROL
+{{proximo_control}}
+
+_______________________
+Dr(a). {{nombre_medico}}
+{{especialidad}}
+Registro: {{registro_medico}}

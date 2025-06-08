@@ -1,0 +1,23 @@
+PODER GENERAL
+
+En {{ciudad}}, {{pais}}, a {{fecha}}, ante mí comparece {{nombre_otorgante}}, {{nacionalidad}}, {{estado_civil}}, {{profesion}}, con domicilio en {{direccion_otorgante}}, portador de la cédula de identidad número {{rut_otorgante}}, quien me expone:
+
+Que por el presente instrumento confiere PODER AMPLIO Y SUFICIENTE a {{nombre_apoderado}}, {{nacionalidad_apoderado}}, {{estado_civil_apoderado}}, {{profesion_apoderado}}, con domicilio en {{direccion_apoderado}}, cédula de identidad número {{rut_apoderado}}, para que en su nombre y representación pueda:
+
+1. ADMINISTRAR todos sus bienes muebles e inmuebles, pudiendo percibir rentas, dividendos, intereses y cualquier otro fruto civil.
+
+2. COMPRAR, VENDER, PERMUTAR, DAR Y RECIBIR en arrendamiento toda clase de bienes.
+
+3. ABRIR, OPERAR Y CERRAR cuentas corrientes bancarias, de ahorro, depósitos a plazo.
+
+4. GIRAR, ACEPTAR, ENDOSAR, DESCONTAR, COBRAR, CANCELAR Y PROTESTAR cheques, letras de cambio, pagarés y demás documentos mercantiles.
+
+5. REPRESENTAR al mandante ante toda clase de autoridades administrativas, judiciales, municipales, etc.
+
+El presente poder tendrá vigencia {{vigencia}} a contar de esta fecha.
+
+Para constancia, firma:
+
+_______________________
+{{nombre_otorgante}}
+RUT: {{rut_otorgante}}

@@ -1,0 +1,43 @@
+# SERVICE AGREEMENT
+
+## Agreement Date
+[DATE]
+
+## Parties
+
+### Service Provider
+- Name: [PROVIDER_NAME]
+- Address: [PROVIDER_ADDRESS]
+- Contact: [PROVIDER_CONTACT]
+
+### Client
+- Name: [CLIENT_NAME]
+- Address: [CLIENT_ADDRESS]  
+- Contact: [CLIENT_CONTACT]
+
+## Scope of Services
+[SERVICES_DESCRIPTION]
+
+## Deliverables
+[DELIVERABLES_LIST]
+
+## Payment Terms
+- Total Amount: [TOTAL_AMOUNT]
+- Payment Schedule:
+  [PAYMENT_SCHEDULE]
+
+## Timeline
+- Start Date: [START_DATE]
+- End Date: [END_DATE]
+- Milestones:
+  [MILESTONES]
+
+## Terms and Conditions
+1. [TERM_1]
+2. [TERM_2]
+3. [TERM_3]
+
+## Signatures
+
+Service Provider: _________________ Date: _______
+Client: _________________ Date: _______

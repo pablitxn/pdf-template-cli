@@ -1,0 +1,40 @@
+FACTURA
+
+{{nombre_empresa}}
+{{rut_empresa}}
+{{direccion_empresa}}
+{{telefono_empresa}}
+{{email_empresa}}
+
+FACTURA N°: {{numero_factura}}
+FECHA: {{fecha_emision}}
+
+DATOS DEL CLIENTE
+Razón Social: {{razon_social_cliente}}
+RUT: {{rut_cliente}}
+Dirección: {{direccion_cliente}}
+Teléfono: {{telefono_cliente}}
+Email: {{email_cliente}}
+
+DETALLE DE PRODUCTOS/SERVICIOS
+================================================================================
+CANT.   DESCRIPCIÓN                                    P.UNITARIO    TOTAL
+================================================================================
+{{detalle_items}}
+================================================================================
+
+                                                SUBTOTAL:     {{subtotal}}
+                                                IVA (19%):    {{iva}}
+                                                TOTAL:        {{total}}
+
+FORMA DE PAGO: {{forma_pago}}
+CONDICIONES: {{condiciones_pago}}
+
+SON: {{total_palabras}}
+
+OBSERVACIONES:
+{{observaciones}}
+
+_______________________________
+{{nombre_vendedor}}
+{{cargo_vendedor}}

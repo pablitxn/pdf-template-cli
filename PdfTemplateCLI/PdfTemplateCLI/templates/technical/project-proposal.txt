@@ -1,0 +1,58 @@
+PROJECT PROPOSAL
+
+{{company_name}}
+{{date}}
+
+PROJECT TITLE: {{project_title}}
+
+CLIENT: {{client_name}}
+PREPARED BY: {{prepared_by}}
+
+EXECUTIVE SUMMARY
+{{executive_summary}}
+
+PROJECT OBJECTIVES
+{{project_objectives}}
+
+SCOPE OF WORK
+{{scope_of_work}}
+
+DELIVERABLES
+{{deliverables}}
+
+TIMELINE
+Project Start: {{start_date}}
+Project End: {{end_date}}
+
+MILESTONES
+{{milestones}}
+
+TECHNICAL APPROACH
+{{technical_approach}}
+
+TECHNOLOGY STACK
+{{technology_stack}}
+
+TEAM COMPOSITION
+{{team_composition}}
+
+BUDGET BREAKDOWN
+{{budget_breakdown}}
+
+TOTAL INVESTMENT: {{total_cost}}
+
+RISKS AND MITIGATION
+{{risks}}
+
+ASSUMPTIONS
+{{assumptions}}
+
+TERMS AND CONDITIONS
+{{terms_conditions}}
+
+ACCEPTANCE
+
+_______________________________          _______________________________
+{{prepared_by}}                          {{client_representative}}
+{{company_name}}                         {{client_name}}
+Date: {{signature_date_1}}              Date: {{signature_date_2}}

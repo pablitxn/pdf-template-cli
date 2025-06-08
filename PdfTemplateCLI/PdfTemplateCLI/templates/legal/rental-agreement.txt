@@ -1,0 +1,36 @@
+CONTRATO DE ARRENDAMIENTO
+
+Entre {{nombre_arrendador}}, RUT {{rut_arrendador}}, en adelante "el Arrendador", y {{nombre_arrendatario}}, RUT {{rut_arrendatario}}, en adelante "el Arrendatario", se celebra el siguiente contrato de arrendamiento:
+
+PRIMERO: OBJETO
+El Arrendador da en arrendamiento al Arrendatario la propiedad ubicada en {{direccion_propiedad}}, comuna de {{comuna}}, ciudad de {{ciudad}}.
+
+SEGUNDO: DESTINO
+La propiedad se arrienda exclusivamente para {{uso_propiedad}}.
+
+TERCERO: CANON Y REAJUSTE
+El canon de arrendamiento es de {{monto_arriendo}} ({{monto_arriendo_palabras}}) mensuales, que se pagará por mes anticipado, dentro de los primeros {{dia_pago}} días de cada mes.
+
+CUARTO: PLAZO
+El arrendamiento tendrá una duración de {{plazo_contrato}}, contados desde el {{fecha_inicio}}.
+
+QUINTO: GARANTÍA
+El Arrendatario entrega en este acto la suma de {{monto_garantia}} como garantía, equivalente a {{numero_meses_garantia}} mes(es) de arriendo.
+
+SEXTO: ESTADO DE LA PROPIEDAD
+El Arrendatario declara recibir la propiedad en {{estado_propiedad}} estado, con {{inventario}}.
+
+SÉPTIMO: SERVICIOS BÁSICOS
+Serán de cargo del {{responsable_servicios}} los gastos por concepto de {{servicios_incluidos}}.
+
+OCTAVO: PROHIBICIONES
+Queda prohibido al Arrendatario:
+- Subarrendar total o parcialmente sin autorización escrita
+- Hacer modificaciones sin consentimiento del Arrendador
+- {{prohibiciones_adicionales}}
+
+Para constancia, firman:
+
+_______________________          _______________________
+{{nombre_arrendador}}            {{nombre_arrendatario}}
+RUT: {{rut_arrendador}}          RUT: {{rut_arrendatario}}

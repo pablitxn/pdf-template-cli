@@ -1,0 +1,44 @@
+BUG REPORT
+
+Report ID: {{report_id}}
+Date: {{date}}
+Reporter: {{reporter_name}}
+Email: {{reporter_email}}
+
+PROJECT INFORMATION
+Project: {{project_name}}
+Version: {{version}}
+Environment: {{environment}}
+
+BUG DETAILS
+Title: {{bug_title}}
+Severity: {{severity}}
+Priority: {{priority}}
+Category: {{category}}
+
+DESCRIPTION
+{{bug_description}}
+
+STEPS TO REPRODUCE
+{{steps_to_reproduce}}
+
+EXPECTED BEHAVIOR
+{{expected_behavior}}
+
+ACTUAL BEHAVIOR
+{{actual_behavior}}
+
+SYSTEM INFORMATION
+OS: {{operating_system}}
+Browser: {{browser}}
+Device: {{device}}
+Additional Info: {{additional_info}}
+
+ATTACHMENTS
+{{attachments}}
+
+ASSIGNED TO: {{assigned_to}}
+STATUS: {{status}}
+
+COMMENTS/NOTES
+{{comments}}

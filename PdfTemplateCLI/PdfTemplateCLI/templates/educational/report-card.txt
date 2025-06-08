@@ -1,0 +1,35 @@
+INFORME DE CALIFICACIONES
+
+{{nombre_institucion}}
+{{direccion_institucion}}
+
+DATOS DEL ESTUDIANTE
+Nombre: {{nombre_estudiante}}
+RUT: {{rut_estudiante}}
+Curso: {{curso}}
+Año Académico: {{año_academico}}
+Período: {{periodo}}
+
+ASIGNATURAS Y CALIFICACIONES
+================================
+ASIGNATURA                      N1    N2    N3    N4    PROM   EXAMEN   FINAL
+{{detalle_calificaciones}}
+================================
+
+PROMEDIO GENERAL: {{promedio_general}}
+
+ASISTENCIA
+Total días hábiles: {{dias_habiles}}
+Días asistidos: {{dias_asistidos}}
+Porcentaje: {{porcentaje_asistencia}}%
+
+OBSERVACIONES DEL PROFESOR JEFE
+{{observaciones}}
+
+SITUACIÓN FINAL: {{situacion_final}}
+
+{{ciudad}}, {{fecha}}
+
+_______________________________          _______________________________
+{{nombre_profesor_jefe}}                 {{nombre_director}}
+Profesor Jefe                            Director(a)

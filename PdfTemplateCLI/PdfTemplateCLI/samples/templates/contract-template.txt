@@ -1,0 +1,29 @@
+CONTRACT AGREEMENT
+
+This Agreement is entered into on {{date}} between {{party1_name}} (hereinafter referred to as "Party 1") and {{party2_name}} (hereinafter referred to as "Party 2").
+
+WHEREAS, Party 1 is engaged in {{party1_business}};
+WHEREAS, Party 2 is engaged in {{party2_business}};
+
+NOW, THEREFORE, in consideration of the mutual covenants and agreements hereinafter set forth, the parties agree as follows:
+
+1. SCOPE OF WORK
+{{scope_description}}
+
+2. TERM
+This Agreement shall commence on {{start_date}} and continue until {{end_date}}, unless earlier terminated in accordance with the provisions hereof.
+
+3. COMPENSATION
+Party 2 shall pay Party 1 the amount of {{amount}} for the services rendered.
+
+4. CONFIDENTIALITY
+Both parties agree to maintain confidentiality regarding {{confidential_matters}}.
+
+5. GOVERNING LAW
+This Agreement shall be governed by the laws of {{jurisdiction}}.
+
+IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first above written.
+
+_______________________               _______________________
+{{party1_name}}                       {{party2_name}}
+Date: {{signature_date1}}             Date: {{signature_date2}}

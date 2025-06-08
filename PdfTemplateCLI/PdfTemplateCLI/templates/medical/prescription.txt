@@ -1,0 +1,29 @@
+RECETA MÉDICA
+
+{{nombre_institucion}}
+{{direccion_institucion}}
+Tel: {{telefono_institucion}}
+
+Fecha: {{fecha}}
+
+PACIENTE: {{nombre_paciente}}
+RUT: {{rut_paciente}}
+Edad: {{edad}} años
+
+Rp/
+
+{{medicamentos}}
+
+INDICACIONES:
+{{indicaciones}}
+
+OBSERVACIONES:
+{{observaciones}}
+
+Próximo control: {{proximo_control}}
+
+_______________________________
+Dr(a). {{nombre_medico}}
+{{especialidad}}
+RUT: {{rut_medico}}
+Reg. {{registro_medico}}

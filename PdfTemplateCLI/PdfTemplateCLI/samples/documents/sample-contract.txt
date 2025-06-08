@@ -1,0 +1,37 @@
+AGREEMENT FOR SERVICES
+
+Date: January 15, 2024
+
+Between:
+John Smith (Service Provider)
+123 Main Street, City, State 12345
+Email: john@example.com
+
+And:
+ABC Corporation (Client)
+456 Business Ave, City, State 67890
+Email: contact@abccorp.com
+
+Services to be provided:
+The Service Provider agrees to develop a custom software solution for inventory management including:
+- Database design and implementation
+- User interface development
+- API integration with existing systems
+- Testing and deployment
+- 3 months of post-launch support
+
+Payment:
+Total amount: $50,000
+Payment schedule:
+- 30% upon signing ($15,000)
+- 40% at project midpoint ($20,000)
+- 30% upon completion ($15,000)
+
+Timeline:
+Project start: February 1, 2024
+Expected completion: May 1, 2024
+
+Both parties agree to the terms outlined above.
+
+Service Provider: _________________
+Client: _________________

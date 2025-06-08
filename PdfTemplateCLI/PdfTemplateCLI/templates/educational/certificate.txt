@@ -1,0 +1,24 @@
+CERTIFICADO DE FINALIZACIÓN
+
+{{nombre_institucion}}
+{{logo_institucion}}
+
+Certifica que
+
+{{nombre_estudiante}}
+
+Ha completado satisfactoriamente el curso
+
+"{{nombre_curso}}"
+
+Con una duración de {{duracion_horas}} horas académicas
+Realizado desde el {{fecha_inicio}} hasta el {{fecha_fin}}
+
+Calificación obtenida: {{calificacion}}
+Registro N°: {{numero_registro}}
+
+{{ciudad}}, {{fecha_emision}}
+
+_______________________________          _______________________________
+{{nombre_director}}                      {{nombre_instructor}}
+Director Académico                       Instructor Principal

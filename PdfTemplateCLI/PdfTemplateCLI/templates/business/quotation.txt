@@ -1,0 +1,46 @@
+COTIZACIÓN
+
+{{nombre_empresa}}
+{{direccion_empresa}}
+Tel: {{telefono_empresa}} | Email: {{email_empresa}}
+
+N° Cotización: {{numero_cotizacion}}
+Fecha: {{fecha}}
+Válida hasta: {{fecha_validez}}
+
+PARA:
+{{nombre_cliente}}
+{{empresa_cliente}}
+{{direccion_cliente}}
+
+Estimado(a) {{nombre_contacto}}:
+
+Por medio de la presente, tenemos el agrado de cotizar lo siguiente:
+
+DETALLE DE PRODUCTOS/SERVICIOS
+{{detalle_items}}
+
+RESUMEN DE COSTOS
+Subtotal: {{subtotal}}
+Descuento: {{descuento}}
+IVA: {{iva}}
+TOTAL: {{total}}
+
+CONDICIONES COMERCIALES:
+- Forma de pago: {{forma_pago}}
+- Plazo de entrega: {{plazo_entrega}}
+- Lugar de entrega: {{lugar_entrega}}
+- Garantía: {{garantia}}
+
+OBSERVACIONES:
+{{observaciones}}
+
+Quedamos atentos a sus comentarios.
+
+Atentamente,
+
+_______________________________
+{{nombre_vendedor}}
+{{cargo_vendedor}}
+{{telefono_vendedor}}
+{{email_vendedor}}
