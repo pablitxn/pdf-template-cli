@@ -1,4 +1,4 @@
-using PdfTemplateCLI.TestValidation;
+using E2E.TestValidation;
 
 Console.WriteLine("PDF Template CLI - Validation Test Runner");
 Console.WriteLine("========================================\n");
@@ -14,5 +14,4 @@ catch (Exception ex)
     Environment.Exit(1);
 }
 
-Console.WriteLine("\nPress any key to exit...");
-Console.ReadKey();
+// Don't wait for key when running in automated mode

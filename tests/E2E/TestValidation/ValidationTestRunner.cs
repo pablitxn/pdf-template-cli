@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PdfTemplateCLI.Application.DTOs;
@@ -7,9 +8,8 @@ using PdfTemplateCLI.Infrastructure.AI;
 using PdfTemplateCLI.Infrastructure.DocumentProcessing;
 using PdfTemplateCLI.Infrastructure.Repositories;
 using PdfTemplateCLI.Infrastructure.Validation;
-using System.Text.Json;
 
-namespace PdfTemplateCLI.TestValidation;
+namespace E2E.TestValidation;
 
 public class ValidationTestRunner
 {
@@ -19,29 +19,59 @@ public class ValidationTestRunner
     
     public ValidationTestRunner()
     {
+        // Find the correct path for appsettings.json
+        var currentDirectory = Directory.GetCurrentDirectory();
+        var appSettingsPath = Path.Combine(currentDirectory, "tests", "E2E", "appsettings.json");
+        
+        // If not found, try looking in the current directory (when running from E2E folder)
+        if (!File.Exists(appSettingsPath))
+        {
+            appSettingsPath = Path.Combine(currentDirectory, "appsettings.json");
+        }
+        
+        // If still not found, try the CLI project's appsettings
+        if (!File.Exists(appSettingsPath))
+        {
+            appSettingsPath = Path.Combine(currentDirectory, "src", "Adapters", "CLI", "appsettings.json");
+        }
+        
+        var basePath = Path.GetDirectoryName(appSettingsPath) ?? currentDirectory;
+        
         var configuration = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: false)
+            .SetBasePath(basePath)
+            .AddJsonFile(Path.GetFileName(appSettingsPath), optional: false)
             .AddEnvironmentVariables()
             .Build();
         
         var services = new ServiceCollection();
         
-        // Register all services
+        // Add logging
+        services.AddLogging();
+        
+        // Register configuration and options
         services.AddSingleton<IConfiguration>(configuration);
+        services.Configure<PdfTemplateCLI.Application.Configuration.ApplicationOptions>(
+            configuration.GetSection("Application"));
+        
+        // Register repositories
         services.AddSingleton<IDocumentRepository, InMemoryDocumentRepository>();
         services.AddSingleton<ITemplateRepository, InMemoryTemplateRepository>();
+        
+        // Register services
         services.AddSingleton<INormalizationService, SemanticKernelService>();
+        services.AddScoped<IDocumentValidator, PdfTemplateCLI.Application.Services.DocumentValidator>();
         
         // Document readers
         services.AddScoped<AsposePdfReader>();
         services.AddScoped<AsposeWordReader>();
         services.AddScoped<AsposeImageReader>();
         services.AddScoped<AsposeTemplateReader>();
+        services.AddScoped<TextFileReader>();
         services.AddScoped<IDocumentReader>(sp =>
         {
             var readers = new List<IDocumentReader>
             {
+                sp.GetRequiredService<TextFileReader>(),
                 sp.GetRequiredService<AsposePdfReader>(),
                 sp.GetRequiredService<AsposeWordReader>(),
                 sp.GetRequiredService<AsposeImageReader>(),
@@ -118,14 +148,28 @@ public class ValidationTestRunner
             {
                 TestCase = testCase,
                 Success = false,
-                Error = ex.Message
+                Error = $"{ex.GetType().Name}: {ex.Message}{(ex.InnerException != null ? $" Inner: {ex.InnerException.Message}" : "")}"
             };
         }
     }
     
     private List<TestCase> GetTestCases()
     {
-        var outputDir = "test-outputs";
+        // Determine the fixtures base path
+        var currentDir = Directory.GetCurrentDirectory();
+        var fixturesPath = Path.Combine(currentDir, "tests", "E2E", "Fixtures");
+        
+        // If running from E2E directory, adjust path
+        if (!Directory.Exists(fixturesPath))
+        {
+            fixturesPath = Path.Combine(currentDir, "Fixtures");
+        }
+        
+        var outputDir = Path.Combine(currentDir, "tests", "E2E", "test-outputs");
+        if (!Directory.Exists(Path.GetDirectoryName(outputDir)))
+        {
+            outputDir = "test-outputs";
+        }
         Directory.CreateDirectory(outputDir);
         
         return new List<TestCase>
@@ -133,32 +177,32 @@ public class ValidationTestRunner
             new TestCase
             {
                 Name = "Unformatted Contract → Legal Template",
-                InputDocument = "user-data/documents/unformatted-contract.txt",
-                Template = "templates/legal/rental-agreement.txt",
+                InputDocument = Path.Combine(fixturesPath, "user-data/documents/unformatted-contract.txt"),
+                Template = Path.Combine(fixturesPath, "templates/legal/rental-agreement.txt"),
                 OutputPath = Path.Combine(outputDir, "contract-normalized.pdf"),
                 Category = "Legal"
             },
             new TestCase
             {
                 Name = "Messy Invoice → Business Template",
-                InputDocument = "user-data/documents/messy-invoice.txt",
-                Template = "templates/business/invoice.txt",
+                InputDocument = Path.Combine(fixturesPath, "user-data/documents/messy-invoice.txt"),
+                Template = Path.Combine(fixturesPath, "templates/business/invoice.txt"),
                 OutputPath = Path.Combine(outputDir, "invoice-normalized.pdf"),
                 Category = "Business"
             },
             new TestCase
             {
                 Name = "Patient Notes → Medical Report",
-                InputDocument = "user-data/documents/patient-notes.txt",
-                Template = "templates/medical/medical-report.txt",
+                InputDocument = Path.Combine(fixturesPath, "user-data/documents/patient-notes.txt"),
+                Template = Path.Combine(fixturesPath, "templates/medical/medical-report.txt"),
                 OutputPath = Path.Combine(outputDir, "medical-report-normalized.pdf"),
                 Category = "Medical"
             },
             new TestCase
             {
                 Name = "Project Status → Technical Proposal",
-                InputDocument = "user-data/reports/project-status.txt",
-                Template = "templates/technical/project-proposal.txt",
+                InputDocument = Path.Combine(fixturesPath, "user-data/reports/project-status.txt"),
+                Template = Path.Combine(fixturesPath, "templates/technical/project-proposal.txt"),
                 OutputPath = Path.Combine(outputDir, "project-proposal-normalized.pdf"),
                 Category = "Technical"
             }
@@ -167,42 +211,55 @@ public class ValidationTestRunner
     
     private void GenerateSummary(List<TestResult> results)
     {
-        var summary = new
+        var validResults = results.Where(r => r.ValidationResult != null).ToList();
+        
+        var fullReport = new
         {
-            Timestamp = DateTime.UtcNow,
-            TotalTests = results.Count,
-            Passed = results.Count(r => r.Success),
-            Failed = results.Count(r => !r.Success),
-            AverageConfidence = results
-                .Where(r => r.ValidationResult != null)
-                .Average(r => r.ValidationResult.ConfidenceScore),
-            ResultsByCategory = results
+            summary = new
+            {
+                totalTests = results.Count,
+                passed = results.Count(r => r.Success),
+                failed = results.Count(r => !r.Success),
+                averageConfidence = validResults.Any() 
+                    ? validResults.Average(r => r.ValidationResult!.ConfidenceScore)
+                    : 0.0
+            },
+            timestamp = DateTime.UtcNow,
+            resultsByCategory = results
                 .GroupBy(r => r.TestCase.Category)
                 .Select(g => new
                 {
-                    Category = g.Key,
-                    Total = g.Count(),
-                    Passed = g.Count(r => r.Success)
+                    category = g.Key,
+                    total = g.Count(),
+                    passed = g.Count(r => r.Success)
                 }),
-            DetailedResults = results.Select(r => new
+            detailedResults = results.Select(r => new
             {
-                Test = r.TestCase.Name,
-                Passed = r.Success,
-                Confidence = r.ValidationResult?.ConfidenceScore,
-                Issues = r.ValidationResult?.Issues.Count ?? 0,
-                Summary = r.ValidationResult?.Summary ?? r.Error
+                test = r.TestCase.Name,
+                passed = r.Success,
+                confidence = r.ValidationResult?.ConfidenceScore,
+                issues = r.ValidationResult?.Issues.Count ?? 0,
+                summary = r.ValidationResult?.Summary ?? r.Error
             })
         };
         
-        var json = JsonSerializer.Serialize(summary, new JsonSerializerOptions { WriteIndented = true });
-        File.WriteAllText("validation-summary.json", json);
+        var json = JsonSerializer.Serialize(fullReport, new JsonSerializerOptions { WriteIndented = true });
+        // Save summary to correct location
+        var currentDir = Directory.GetCurrentDirectory();
+        var summaryPath = Path.Combine(currentDir, "tests", "E2E", "validation-summary.json");
+        if (!Directory.Exists(Path.GetDirectoryName(summaryPath)))
+        {
+            summaryPath = "validation-summary.json";
+        }
+        
+        File.WriteAllText(summaryPath, json);
         
         Console.WriteLine("\n=== TEST SUMMARY ===");
-        Console.WriteLine($"Total: {summary.TotalTests}");
-        Console.WriteLine($"Passed: {summary.Passed}");
-        Console.WriteLine($"Failed: {summary.Failed}");
-        Console.WriteLine($"Average Confidence: {summary.AverageConfidence:P2}");
-        Console.WriteLine("\nDetailed report saved to: validation-summary.json");
+        Console.WriteLine($"Total: {fullReport.summary.totalTests}");
+        Console.WriteLine($"Passed: {fullReport.summary.passed}");
+        Console.WriteLine($"Failed: {fullReport.summary.failed}");
+        Console.WriteLine($"Average Confidence: {fullReport.summary.averageConfidence:P2}");
+        Console.WriteLine($"\nDetailed report saved to: {summaryPath}");
     }
     
     private class TestCase

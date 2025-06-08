@@ -8,14 +8,21 @@ echo "================================================"
 echo ""
 
 # Check if API key is configured
-if grep -q "YOUR_OPENAI_API_KEY" src/Adapters/CLI/appsettings.json; then
+API_KEY=$(grep -Po '"ApiKey"\s*:\s*"\K[^"]*' src/Adapters/CLI/appsettings.json 2>/dev/null || echo "")
+if [ -z "$API_KEY" ]; then
     echo "⚠️  WARNING: OpenAI API key not configured!"
-    echo "Please update src/Adapters/CLI/appsettings.json with your API key"
+    echo "Please set the OpenAI API key in src/Adapters/CLI/appsettings.json"
+    echo "Or set the OPENAI_API_KEY environment variable"
     echo ""
-    read -p "Continue anyway? (y/N): " -n 1 -r
-    echo ""
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        exit 1
+    # Check if environment variable is set
+    if [ -n "$OPENAI_API_KEY" ]; then
+        echo "✓ Found OPENAI_API_KEY environment variable"
+    else
+        read -p "Continue anyway? (y/N): " -n 1 -r
+        echo ""
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            exit 1
+        fi
     fi
 fi
 

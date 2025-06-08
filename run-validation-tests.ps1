@@ -6,14 +6,21 @@ Write-Host "================================================" -ForegroundColor C
 Write-Host ""
 
 # Check if API key is configured
-$appsettings = Get-Content "src\Adapters\CLI\appsettings.json" -Raw
-if ($appsettings -match "YOUR_OPENAI_API_KEY") {
+$appsettings = Get-Content "src\Adapters\CLI\appsettings.json" | ConvertFrom-Json
+$apiKey = $appsettings.OpenAI.ApiKey
+if ([string]::IsNullOrWhiteSpace($apiKey)) {
     Write-Host "⚠️  WARNING: OpenAI API key not configured!" -ForegroundColor Yellow
-    Write-Host "Please update src\Adapters\CLI\appsettings.json with your API key" -ForegroundColor Yellow
+    Write-Host "Please set the OpenAI API key in src\Adapters\CLI\appsettings.json" -ForegroundColor Yellow
+    Write-Host "Or set the OPENAI_API_KEY environment variable" -ForegroundColor Yellow
     Write-Host ""
-    $response = Read-Host "Continue anyway? (y/N)"
-    if ($response -ne 'y' -and $response -ne 'Y') {
-        exit 1
+    # Check if environment variable is set
+    if ($env:OPENAI_API_KEY) {
+        Write-Host "✓ Found OPENAI_API_KEY environment variable" -ForegroundColor Green
+    } else {
+        $response = Read-Host "Continue anyway? (y/N)"
+        if ($response -ne 'y' -and $response -ne 'Y') {
+            exit 1
+        }
     }
 }
 

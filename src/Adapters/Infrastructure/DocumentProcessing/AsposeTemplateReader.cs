@@ -8,7 +8,7 @@ namespace PdfTemplateCLI.Infrastructure.DocumentProcessing;
 
 public class AsposeTemplateReader : IDocumentReader
 {
-    private readonly string[] _supportedExtensions = { ".pdf", ".doc", ".docx", ".rtf", ".odt" };
+    private readonly string[] _supportedExtensions = { ".txt", ".pdf", ".doc", ".docx", ".rtf", ".odt" };
 
     public async Task<string> ReadDocumentAsync(string filePath, CancellationToken cancellationToken = default)
     {
@@ -16,7 +16,11 @@ public class AsposeTemplateReader : IDocumentReader
         {
             var extension = Path.GetExtension(filePath).ToLowerInvariant();
             
-            if (extension == ".pdf")
+            if (extension == ".txt")
+            {
+                return File.ReadAllText(filePath);
+            }
+            else if (extension == ".pdf")
             {
                 return ReadPdfTemplate(filePath);
             }
@@ -47,5 +51,10 @@ public class AsposeTemplateReader : IDocumentReader
     {
         var doc = new Aspose.Words.Document(filePath);
         return doc.GetText();
+    }
+
+    public PdfTemplateCLI.Domain.Enums.DocumentType GetDocumentType()
+    {
+        return PdfTemplateCLI.Domain.Enums.DocumentType.Text;
     }
 }

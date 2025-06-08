@@ -32,16 +32,24 @@ git clone https://github.com/yourusername/pdf-template-cli.git
 cd pdf-template-cli
 ```
 
-2. Configure your AI provider in `src/Adapters/CLI/appsettings.json`:
-```json
-{
-  "SemanticKernel": {
-    "Provider": "OpenAI",
-    "ApiKey": "YOUR_API_KEY",
-    "Model": "gpt-4"
-  }
-}
-```
+2. Configure your OpenAI API key using one of these methods:
+
+   **Option A**: Set in `src/Adapters/CLI/appsettings.json`:
+   ```json
+   {
+     "OpenAI": {
+       "ApiKey": "YOUR_API_KEY",
+       "Model": "gpt-4"
+     }
+   }
+   ```
+
+   **Option B**: Set as environment variable:
+   ```bash
+   export OPENAI_API_KEY="your-api-key-here"  # Linux/macOS
+   set OPENAI_API_KEY=your-api-key-here       # Windows CMD
+   $env:OPENAI_API_KEY="your-api-key-here"    # Windows PowerShell
+   ```
 
 3. Build the project:
 ```bash
@@ -224,7 +232,9 @@ The E2E tests include various real-world scenarios:
 - **Medical**: Patient notes → Medical report templates
 - **Technical**: Project updates → Technical report templates
 
-⚠️ **Note**: Ensure your OpenAI API key is configured in `src/Adapters/CLI/appsettings.json` before running validation tests.
+⚠️ **Note**: Ensure your OpenAI API key is configured before running validation tests:
+- Either in `src/Adapters/CLI/appsettings.json` under `OpenAI:ApiKey`
+- Or as the `OPENAI_API_KEY` environment variable
 
 ## 🏗️ Architecture
 

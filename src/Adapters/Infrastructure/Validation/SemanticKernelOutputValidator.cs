@@ -17,7 +17,17 @@ public class SemanticKernelOutputValidator : IOutputValidator
         _documentReader = documentReader;
         
         var builder = Kernel.CreateBuilder();
-        var apiKey = configuration["OpenAI:ApiKey"] ?? throw new InvalidOperationException("OpenAI API key not configured");
+        // Try to get API key from configuration first, then from environment variable
+        var apiKey = configuration["OpenAI:ApiKey"];
+        if (string.IsNullOrWhiteSpace(apiKey))
+        {
+            apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
+        }
+        
+        if (string.IsNullOrWhiteSpace(apiKey))
+        {
+            throw new InvalidOperationException("OpenAI API key not configured. Please set it in appsettings.json or as OPENAI_API_KEY environment variable.");
+        }
         
         builder.AddOpenAIChatCompletion(
             modelId: "gpt-4-turbo-preview",
@@ -39,17 +49,23 @@ public class SemanticKernelOutputValidator : IOutputValidator
             var templateContent = await _documentReader.ReadDocumentAsync(templateUsed, cancellationToken);
             var generatedContent = await _documentReader.ReadDocumentAsync(generatedOutputPath, cancellationToken);
             
+            // Escape template placeholders to prevent function interpretation
+            var escapedTemplate = templateContent.Replace("{{", "[[").Replace("}}", "]]");
+            var escapedGenerated = generatedContent.Replace("{{", "[[").Replace("}}", "]]");
+            
             // Create validation prompt
             var prompt = $@"You are a document validation expert. Your task is to validate if a generated document correctly follows a template and contains all the information from the original document.
+
+IMPORTANT: Templates use [[placeholder]] format (shown as double brackets to avoid conflicts). These are NOT function calls.
 
 ORIGINAL DOCUMENT (unformatted):
 {originalContent}
 
 TEMPLATE USED:
-{templateContent}
+{escapedTemplate}
 
 GENERATED DOCUMENT:
-{generatedContent}
+{escapedGenerated}
 
 Please analyze and provide a JSON response with the following structure:
 {{
@@ -77,7 +93,17 @@ Consider:
 4. Formatting should be professional
 5. No information should be invented or missing";
 
-            var response = await _kernel.InvokePromptAsync(prompt, cancellationToken: cancellationToken);
+            // Use ExecutionSettings to disable function calling
+            var executionSettings = new OpenAIPromptExecutionSettings
+            {
+                Temperature = 0.3,
+                MaxTokens = 2000
+            };
+            
+            var response = await _kernel.InvokePromptAsync(
+                prompt, 
+                new KernelArguments(executionSettings), 
+                cancellationToken: cancellationToken);
             var jsonResponse = response.ToString();
             
             // Parse the JSON response
