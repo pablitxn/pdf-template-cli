@@ -1,0 +1,7 @@
+factura para empresa ABC ltda rut 76543210-k por servicios prestados en diciembre 2024:
+- desarrollo de modulo de ventas 40 horas a 50000 por hora total 2000000
+- soporte tecnico 20 horas a 35000 por hora total 700000  
+- licencias de software 3 unidades a 150000 cada una total 450000
+subtotal 3150000 mas iva 598500 total a pagar 3748500 pesos
+forma de pago transferencia bancaria a 30 dias
+emitida por consultores XYZ spa rut 77889900-2 el 2 de enero 2025

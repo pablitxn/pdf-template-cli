@@ -56,3 +56,4 @@ ehthumbs.db
 
 # Visual Studio Code
 .vscode/
+**/.claude/

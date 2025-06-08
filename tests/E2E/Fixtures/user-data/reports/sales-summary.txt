@@ -1,0 +1,8 @@
+resumen ventas diciembre 2024
+region norte: 45 millones (120 transacciones)
+region centro: 78 millones (245 transacciones)  
+region sur: 32 millones (89 transacciones)
+total ventas: 155 millones
+productos mas vendidos: laptop gamer (35 unidades), mouse inalambrico (89 unidades), teclado mecanico (67 unidades)
+comparado con noviembre hay un aumento del 23% en ventas
+se recomienda aumentar stock de perifericos para enero

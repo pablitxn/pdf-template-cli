@@ -1,0 +1,8 @@
+proyecto sistema inventario estado actual 65% completado
+modulos terminados: autenticacion usuarios gestion productos reportes basicos
+en desarrollo: integracion con contabilidad modulo de compras api rest
+pendiente: app movil documentacion tecnica pruebas de carga
+equipo: 3 desarrolladores 1 tester 1 scrum master
+riesgos: posible retraso en integracion contable por cambios en requisitos
+fecha estimada finalizacion: 15 febrero 2025
+presupuesto usado: 18 millones de 25 millones asignados
