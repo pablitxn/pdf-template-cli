@@ -7,4 +7,18 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Core\Application\Application.csproj" />
+        <ProjectReference Include="..\..\src\Core\Domain\Domain.csproj" />
+        <ProjectReference Include="..\..\src\Adapters\Infrastructure\Infrastructure.csproj" />
+        <ProjectReference Include="..\..\src\Adapters\CLI\CLI.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
+    </ItemGroup>
+
 </Project>

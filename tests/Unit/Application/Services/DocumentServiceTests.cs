@@ -1,5 +1,8 @@
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
+using PdfTemplateCLI.Application.Configuration;
 using PdfTemplateCLI.Application.DTOs;
 using PdfTemplateCLI.Application.Interfaces;
 using PdfTemplateCLI.Application.Services;
@@ -12,6 +15,11 @@ public class DocumentServiceTests
     private readonly Mock<IDocumentRepository> _documentRepositoryMock;
     private readonly Mock<ITemplateRepository> _templateRepositoryMock;
     private readonly Mock<INormalizationService> _normalizationServiceMock;
+    private readonly Mock<IDocumentReader> _documentReaderMock;
+    private readonly Mock<IDocumentWriter> _documentWriterMock;
+    private readonly Mock<IDocumentValidator> _documentValidatorMock;
+    private readonly Mock<IOptions<ApplicationOptions>> _optionsMock;
+    private readonly Mock<ILogger<DocumentService>> _loggerMock;
     private readonly DocumentService _documentService;
 
     public DocumentServiceTests()
@@ -19,11 +27,23 @@ public class DocumentServiceTests
         _documentRepositoryMock = new Mock<IDocumentRepository>();
         _templateRepositoryMock = new Mock<ITemplateRepository>();
         _normalizationServiceMock = new Mock<INormalizationService>();
+        _documentReaderMock = new Mock<IDocumentReader>();
+        _documentWriterMock = new Mock<IDocumentWriter>();
+        _documentValidatorMock = new Mock<IDocumentValidator>();
+        _optionsMock = new Mock<IOptions<ApplicationOptions>>();
+        _loggerMock = new Mock<ILogger<DocumentService>>();
+        
+        _optionsMock.Setup(x => x.Value).Returns(new ApplicationOptions());
         
         _documentService = new DocumentService(
             _documentRepositoryMock.Object,
             _templateRepositoryMock.Object,
-            _normalizationServiceMock.Object);
+            _normalizationServiceMock.Object,
+            _documentReaderMock.Object,
+            _documentWriterMock.Object,
+            _documentValidatorMock.Object,
+            _optionsMock.Object,
+            _loggerMock.Object);
     }
 
     [Fact]

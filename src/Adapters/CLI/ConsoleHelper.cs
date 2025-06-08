@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using PdfTemplateCLI.Domain.Exceptions;
 
 namespace PdfTemplateCLI.Presentation.ConsoleUI;
 

@@ -8,6 +8,13 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\src\Core\Application\Application.csproj" />
+        <ProjectReference Include="..\..\src\Core\Domain\Domain.csproj" />
+        <ProjectReference Include="..\..\src\Adapters\Infrastructure\Infrastructure.csproj" />
+        <ProjectReference Include="..\..\src\Adapters\CLI\CLI.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="coverlet.collector" Version="6.0.2"/>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0"/>
         <PackageReference Include="xunit" Version="2.9.2"/>

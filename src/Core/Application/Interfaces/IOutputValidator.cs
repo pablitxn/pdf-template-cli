@@ -1,3 +1,5 @@
+using PdfTemplateCLI.Application.DTOs;
+
 namespace PdfTemplateCLI.Application.Interfaces;
 
 public interface IOutputValidator
