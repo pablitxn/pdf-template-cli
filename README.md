@@ -2,13 +2,13 @@
 
 [![.NET](https://img.shields.io/badge/.NET-9.0-512BD4)](https://dotnet.microsoft.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Architecture](https://img.shields.io/badge/Architecture-Clean%20Architecture-blue)](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
+[![Architecture](https://img.shields.io/badge/Architecture-Hexagonal-orange)](docs/architecture.md)
 
 A powerful command-line tool that uses AI to transform unstructured documents into professionally formatted PDFs using customizable templates.
 
 ## 🚀 Features
 
-- **AI-Powered Document Normalization**: Uses OpenAI GPT-4 to intelligently extract and structure information
+- **AI-Powered Document Normalization**: Uses Semantic Kernel to intelligently extract and structure information
 - **Multi-Format Support**: 
   - **Input**: PDF, Word (DOC/DOCX/RTF/ODT), Images (JPG/PNG/BMP/GIF/TIFF), Text files
   - **Output**: PDF, Word, HTML, Text, Markdown
@@ -16,27 +16,28 @@ A powerful command-line tool that uses AI to transform unstructured documents in
 - **Robust Error Handling**: Domain-specific exceptions with detailed logging
 - **Progress Indicators**: Visual feedback during document processing
 - **Configurable**: Extensive configuration options via appsettings.json
-- **Clean Architecture**: SOLID principles, dependency injection, and separation of concerns
+- **Hexagonal Architecture**: Clean separation of concerns with ports and adapters pattern
 
 ## 📋 Prerequisites
 
 - .NET 9.0 SDK or later
-- OpenAI API key
+- API key for your preferred AI provider (OpenAI, Azure OpenAI, etc.)
 - Aspose licenses (evaluation versions work for testing)
 
 ## 🛠️ Installation
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/PdfTemplateCLI.git
-cd PdfTemplateCLI/PdfTemplateCLI/PdfTemplateCLI
+git clone https://github.com/yourusername/pdf-template-cli.git
+cd pdf-template-cli
 ```
 
-2. Configure your OpenAI API key in `appsettings.json`:
+2. Configure your AI provider in `src/Adapters/CLI/appsettings.json`:
 ```json
 {
-  "OpenAI": {
-    "ApiKey": "YOUR_OPENAI_API_KEY",
+  "SemanticKernel": {
+    "Provider": "OpenAI",
+    "ApiKey": "YOUR_API_KEY",
     "Model": "gpt-4"
   }
 }
@@ -49,29 +50,27 @@ dotnet build
 
 4. Run the application:
 ```bash
-dotnet run
+dotnet run --project src/Adapters/CLI/CLI.csproj
 ```
 
 ## 📁 Project Structure
 
 ```
-PdfTemplateCLI/
+pdf-template-cli/
 ├── src/
-│   ├── Domain/              # Core business entities and rules
-│   ├── Application/         # Business logic and interfaces
-│   ├── Infrastructure/      # External integrations (AI, Aspose)
-│   └── Presentation/        # Console UI
-├── templates/               # Document templates by category
-│   ├── legal/              # Legal documents (contracts, agreements)
-│   ├── medical/            # Medical forms and reports
-│   ├── business/           # Invoices, quotations, proposals
-│   ├── technical/          # Bug reports, project documentation
-│   └── educational/        # Certificates, report cards
-├── user-data/              # Input documents to process
-│   ├── documents/          # Text documents
-│   ├── images/            # Scanned documents
-│   └── reports/           # Unstructured reports
-└── output/                 # Generated documents
+│   ├── Core/
+│   │   ├── Domain/          # Core business entities, value objects and domain rules
+│   │   └── Application/     # Use cases, interfaces, and application services
+│   └── Adapters/
+│       ├── Infrastructure/  # External integrations (AI, Aspose, File System)
+│       └── CLI/            # Console presentation layer
+├── tests/
+│   ├── Unit/               # Unit tests for domain and application logic
+│   ├── Integration/        # Integration tests for infrastructure
+│   └── E2E/               # End-to-end tests with test fixtures
+├── docs/                   # Documentation
+│   └── architecture.md     # Detailed architecture documentation
+└── scripts/               # Utility scripts for testing and validation
 ```
 
 ## 🎯 Usage
@@ -81,7 +80,7 @@ PdfTemplateCLI/
 Simply run the application and follow the menu:
 
 ```bash
-dotnet run
+dotnet run --project src/Adapters/CLI/CLI.csproj
 ```
 
 Menu options:
@@ -100,8 +99,8 @@ Menu options:
 ### Example
 
 ```
-Enter document path: user-data/documents/messy-invoice.txt
-Enter template name: business/invoice.txt
+Enter document path: tests/E2E/Fixtures/user-data/documents/messy-invoice.txt
+Enter template name: business/invoice
 Enter output path: output/invoice-normalized.pdf
 ```
 
@@ -116,6 +115,8 @@ The system includes various templates for common document types:
 - **Business**: Invoices, quotations, proposals
 - **Technical**: Bug reports, project proposals
 - **Educational**: Certificates, report cards
+
+Templates are located in: `tests/E2E/Fixtures/templates/`
 
 ### Template Format
 
@@ -143,11 +144,11 @@ Total: {{total_amount}}
 You can create your own templates:
 1. Create a text file with your desired format
 2. Use `{{field_name}}` for variable fields
-3. Save it anywhere and provide the full path when processing
+3. Save it and provide the path when processing
 
 ## ⚙️ Configuration
 
-Edit `appsettings.json` to customize behavior:
+Edit `src/Adapters/CLI/appsettings.json` to customize behavior:
 
 ```json
 {
@@ -173,7 +174,7 @@ Edit `appsettings.json` to customize behavior:
 
 ## 🔍 Validation System
 
-The tool includes a comprehensive validation system:
+The tool includes a comprehensive validation system powered by AI:
 
 - **Input Validation**: File size, format, and content checks
 - **Output Validation**: AI-powered verification of generated documents
@@ -181,34 +182,42 @@ The tool includes a comprehensive validation system:
 
 Run validation tests:
 ```bash
-dotnet run TestValidation/Program.cs
+dotnet run --project tests/E2E/E2E.csproj
 ```
 
 ## 🏗️ Architecture
 
-The project follows Clean Architecture principles:
+The project follows Hexagonal Architecture (Ports and Adapters) principles:
 
-- **Domain Layer**: Core business logic, entities, and domain rules
-- **Application Layer**: Use cases, DTOs, and service interfaces
-- **Infrastructure Layer**: External dependencies (Aspose, OpenAI, file system)
-- **Presentation Layer**: Console UI and user interaction
+### Core (Domain + Application)
+- **Domain Layer**: Core business logic, entities, value objects, and domain exceptions
+- **Application Layer**: Use cases, DTOs, service interfaces (ports), and application services
+
+### Adapters
+- **Infrastructure**: Implementations of application interfaces (adapters)
+  - AI integration (Semantic Kernel)
+  - Document processing (Aspose)
+  - Repositories (In-memory for demo)
+- **CLI**: Console presentation layer
+
+For detailed architecture information, see [architecture.md](docs/architecture.md)
 
 ### Key Technologies
 
 - **.NET 9.0**: Latest C# features and performance improvements
-- **Semantic Kernel**: AI orchestration and OpenAI integration
+- **Microsoft Semantic Kernel**: AI orchestration and LLM integration
 - **Aspose Suite**: Professional document processing
-- **Serilog**: Structured logging
 - **Dependency Injection**: Clean, testable architecture
+- **xUnit + Moq + FluentAssertions**: Comprehensive testing
 
 ## 📊 Logging
 
-The application uses Serilog for comprehensive logging:
+The application provides comprehensive logging:
 
-- Console output with colored, structured logs
-- Daily rotating file logs in the `logs/` directory
+- Structured console output with progress indicators
 - Configurable log levels
-- Performance metrics and error tracking
+- Performance metrics
+- Error tracking with detailed context
 
 ## 🚦 Error Handling
 
@@ -220,16 +229,37 @@ Robust error handling with custom domain exceptions:
 - `DocumentProcessingException`: Processing failures
 - `NormalizationException`: AI service errors
 
+All exceptions include error codes and detailed messages for debugging.
+
 ## 🧪 Testing
 
-The project includes:
-- Unit tests for domain logic
-- Integration tests for document processing
-- Validation framework for output verification
+The project includes comprehensive testing:
 
-Run tests:
+### Unit Tests
+- Domain entities and value objects
+- Application services
+- Infrastructure components
+
+### Integration Tests
+- Document processing workflows
+- AI integration
+- Repository implementations
+
+### E2E Tests
+- Complete document normalization scenarios
+- Template validation
+- Batch processing
+
+Run all tests:
 ```bash
 dotnet test
+```
+
+Run specific test projects:
+```bash
+dotnet test tests/Unit/Unit.csproj
+dotnet test tests/Integration/Integration.csproj
+dotnet test tests/E2E/E2E.csproj
 ```
 
 ## 🤝 Contributing
@@ -240,6 +270,11 @@ dotnet test
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
+Please ensure:
+- All tests pass
+- Code follows the existing architecture patterns
+- New features include appropriate tests
+
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -248,15 +283,16 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [Aspose](https://www.aspose.com/) for document processing capabilities
 - [Microsoft Semantic Kernel](https://github.com/microsoft/semantic-kernel) for AI orchestration
-- [OpenAI](https://openai.com/) for GPT-4 API
-- [Serilog](https://serilog.net/) for structured logging
+- [xUnit](https://xunit.net/) for testing framework
+- [Moq](https://github.com/moq/moq4) for mocking
+- [FluentAssertions](https://fluentassertions.com/) for test assertions
 
 ## 📧 Support
 
 For issues, questions, or contributions, please:
 - Open an issue on GitHub
-- Check existing documentation
-- Review the [samples](samples/) directory for examples
+- Check the [architecture documentation](docs/architecture.md)
+- Review the test fixtures for examples
 
 ---
 

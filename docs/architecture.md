@@ -3,542 +3,578 @@
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [Architecture Principles](#architecture-principles)
+2. [Hexagonal Architecture](#hexagonal-architecture)
 3. [Solution Structure](#solution-structure)
 4. [Layer Responsibilities](#layer-responsibilities)
-5. [Core Components](#core-components)
-6. [Design Patterns](#design-patterns)
-7. [Dependency Flow](#dependency-flow)
-8. [Coding Conventions](#coding-conventions)
-9. [Error Handling Strategy](#error-handling-strategy)
-10. [Logging Architecture](#logging-architecture)
+5. [Ports and Adapters](#ports-and-adapters)
+6. [Core Components](#core-components)
+7. [Design Patterns](#design-patterns)
+8. [Dependency Flow](#dependency-flow)
+9. [Testing Strategy](#testing-strategy)
+10. [Error Handling](#error-handling)
 11. [Configuration Management](#configuration-management)
-12. [Security Considerations](#security-considerations)
-13. [Performance Considerations](#performance-considerations)
-14. [Testing Strategy](#testing-strategy)
-15. [Future Extensibility](#future-extensibility)
+12. [Future Extensibility](#future-extensibility)
 
 ## Overview
 
-PDF Template CLI is built following **Clean Architecture** principles (also known as Onion Architecture or Hexagonal Architecture). This approach ensures:
+PDF Template CLI is built following **Hexagonal Architecture** (also known as Ports and Adapters Architecture). This architectural pattern was chosen to create a highly maintainable, testable, and flexible application that can easily adapt to changing requirements and technologies.
 
-- **Independence of frameworks**: Business logic doesn't depend on external libraries
-- **Testability**: Business rules can be tested without UI, database, or external services
-- **Independence of UI**: The UI can change without changing the rest of the system
-- **Independence of database**: Business rules are not bound to the database
-- **Independence of external services**: Business rules don't know anything about the outside world
+### Key Benefits
 
-## Architecture Principles
+- **Technology Independence**: Business logic is isolated from external technologies
+- **Testability**: Core logic can be tested in isolation without external dependencies
+- **Flexibility**: Easy to swap implementations (e.g., different AI providers, storage solutions)
+- **Clear Boundaries**: Well-defined interfaces between layers
+- **Business Focus**: Domain logic remains pure and focused on business rules
 
-### 1. Dependency Inversion Principle (DIP)
-- High-level modules do not depend on low-level modules
-- Both depend on abstractions (interfaces)
-- Abstractions do not depend on details
-- Details depend on abstractions
+## Hexagonal Architecture
 
-### 2. Separation of Concerns (SoC)
-- Each layer has a specific responsibility
-- Business logic is isolated from infrastructure concerns
-- UI logic is separated from business logic
+The hexagon represents the application core, with ports (interfaces) defining the boundaries and adapters implementing the connections to the external world.
 
-### 3. Single Responsibility Principle (SRP)
-- Each class has one reason to change
-- Classes are focused and cohesive
-
-### 4. Open/Closed Principle (OCP)
-- Classes are open for extension but closed for modification
-- New features are added through new implementations, not by modifying existing code
+```
+                    ┌─────────────────────────────┐
+                    │      Console CLI            │
+                    │       (Adapter)             │
+                    └─────────────┬───────────────┘
+                                  │
+                    ┌─────────────▼───────────────┐
+                    │         Application         │
+                    │      (Use Cases/Ports)      │
+                    │  ┌───────────────────────┐  │
+                    │  │       Domain          │  │
+                    │  │   (Business Logic)    │  │
+                    │  └───────────────────────┘  │
+                    └─────┬───────────────┬───────┘
+                          │               │
+                ┌─────────▼───┐     ┌─────▼────────┐
+                │ Infrastructure│     │Infrastructure│
+                │  (AI Adapter) │     │(File Adapter)│
+                └──────────────┘     └──────────────┘
+```
 
 ## Solution Structure
 
 ```
-PdfTemplateCLI/
-├── PdfTemplateCLI.sln
-├── docs/                                    # Documentation
-├── scripts/                                 # Utility scripts
-├── templates/                               # Document templates
-├── user-data/                              # User input files
-└── PdfTemplateCLI/
-    ├── PdfTemplateCLI.csproj
-    ├── Program.cs                          # Application entry point
-    ├── appsettings.json                    # Configuration
-    └── src/
-        ├── Domain/                         # Core business logic
-        │   ├── Common/                     # Shared domain concepts
-        │   │   └── Result.cs              # Result pattern implementation
-        │   ├── Entities/                   # Business entities
-        │   │   ├── Document.cs
-        │   │   └── Template.cs
-        │   ├── Enums/                      # Domain enumerations
-        │   │   └── DocumentType.cs
-        │   ├── Exceptions/                 # Domain-specific exceptions
-        │   │   ├── DomainException.cs
-        │   │   ├── DocumentExceptions.cs
-        │   │   ├── TemplateExceptions.cs
-        │   │   └── NormalizationExceptions.cs
-        │   └── ValueObjects/               # Value objects
-        │       └── FilePath.cs
-        │
-        ├── Application/                    # Application business logic
-        │   ├── Configuration/              # Application settings
-        │   │   └── ApplicationOptions.cs
-        │   ├── DTOs/                       # Data transfer objects
-        │   │   ├── DocumentDto.cs
-        │   │   ├── NormalizeDocumentRequest.cs
-        │   │   ├── TemplateDto.cs
-        │   │   └── ValidationResult.cs
-        │   ├── Interfaces/                 # Application contracts
-        │   │   ├── IDocumentReader.cs
-        │   │   ├── IDocumentRepository.cs
-        │   │   ├── IDocumentService.cs
-        │   │   ├── IDocumentValidator.cs
-        │   │   ├── IDocumentWriter.cs
-        │   │   ├── INormalizationService.cs
-        │   │   ├── IOutputValidator.cs
-        │   │   └── ITemplateRepository.cs
-        │   └── Services/                   # Application services
-        │       ├── DocumentService.cs
-        │       └── DocumentValidator.cs
-        │
-        ├── Infrastructure/                 # External concerns
-        │   ├── AI/                        # AI integration
-        │   │   ├── DocumentNormalizerPlugin.cs
-        │   │   ├── DocumentValidatorPlugin.cs
-        │   │   └── SemanticKernelService.cs
-        │   ├── DocumentProcessing/         # Document I/O
-        │   │   ├── AsposeDocumentWriter.cs
-        │   │   ├── AsposeImageReader.cs
-        │   │   ├── AsposePdfReader.cs
-        │   │   ├── AsposeTemplateReader.cs
-        │   │   ├── AsposeWordReader.cs
-        │   │   └── CompositeDocumentReader.cs
-        │   ├── Repositories/              # Data persistence
-        │   │   ├── InMemoryDocumentRepository.cs
-        │   │   └── InMemoryTemplateRepository.cs
-        │   └── Validation/                # Output validation
-        │       └── SemanticKernelOutputValidator.cs
-        │
-        └── Presentation/                   # User interface
-            └── ConsoleUI/
-                ├── ConsoleHandler.cs
-                └── ConsoleHelper.cs
+pdf-template-cli/
+├── src/
+│   ├── Core/                               # The Hexagon (Core Business)
+│   │   ├── Domain/                         # Enterprise Business Rules
+│   │   │   ├── Common/
+│   │   │   │   └── Result.cs              # Functional error handling
+│   │   │   ├── Entities/
+│   │   │   │   ├── Document.cs            # Core business entity
+│   │   │   │   └── Template.cs            # Template entity
+│   │   │   ├── Enums/
+│   │   │   │   └── DocumentType.cs        # Document type enumeration
+│   │   │   ├── Exceptions/                # Domain-specific exceptions
+│   │   │   │   ├── DomainException.cs     # Base exception
+│   │   │   │   ├── DocumentExceptions.cs  # Document-related exceptions
+│   │   │   │   ├── TemplateExceptions.cs  # Template-related exceptions
+│   │   │   │   └── NormalizationExceptions.cs
+│   │   │   └── ValueObjects/
+│   │   │       └── FilePath.cs            # Immutable value object
+│   │   │
+│   │   └── Application/                    # Application Business Rules
+│   │       ├── Configuration/
+│   │       │   └── ApplicationOptions.cs   # Configuration DTOs
+│   │       ├── DTOs/                       # Data Transfer Objects
+│   │       │   ├── DocumentDto.cs
+│   │       │   ├── NormalizeDocumentRequest.cs
+│   │       │   ├── TemplateDto.cs
+│   │       │   ├── ValidationResult.cs
+│   │       │   ├── ValidationRequest.cs
+│   │       │   └── BatchValidationResult.cs
+│   │       ├── Interfaces/                 # Ports (Driven)
+│   │       │   ├── IDocumentReader.cs      # Port for reading documents
+│   │       │   ├── IDocumentRepository.cs  # Port for data persistence
+│   │       │   ├── IDocumentService.cs     # Port for use cases
+│   │       │   ├── IDocumentValidator.cs   # Port for validation
+│   │       │   ├── IDocumentWriter.cs      # Port for writing documents
+│   │       │   ├── INormalizationService.cs # Port for AI normalization
+│   │       │   ├── IOutputValidator.cs     # Port for output validation
+│   │       │   └── ITemplateRepository.cs  # Port for template storage
+│   │       └── Services/                   # Use Case Implementations
+│   │           ├── DocumentService.cs      # Main document use cases
+│   │           └── DocumentValidator.cs    # Validation use cases
+│   │
+│   └── Adapters/                           # External World (Outside Hexagon)
+│       ├── Infrastructure/                 # Driven Adapters
+│       │   ├── AI/                        # AI Integration Adapters
+│       │   │   ├── DocumentNormalizerPlugin.cs
+│       │   │   ├── DocumentValidatorPlugin.cs
+│       │   │   └── SemanticKernelService.cs # Semantic Kernel adapter
+│       │   ├── DocumentProcessing/         # Document I/O Adapters
+│       │   │   ├── AsposeDocumentWriter.cs # Aspose writing adapter
+│       │   │   ├── AsposeImageReader.cs    # Image reading adapter
+│       │   │   ├── AsposePdfReader.cs      # PDF reading adapter
+│       │   │   ├── AsposeTemplateReader.cs # Template reading adapter
+│       │   │   ├── AsposeWordReader.cs     # Word reading adapter
+│       │   │   └── CompositeDocumentReader.cs # Composite pattern
+│       │   ├── Repositories/              # Persistence Adapters
+│       │   │   ├── InMemoryDocumentRepository.cs
+│       │   │   └── InMemoryTemplateRepository.cs
+│       │   └── Validation/                # Validation Adapters
+│       │       └── SemanticKernelOutputValidator.cs
+│       │
+│       └── CLI/                           # Driving Adapter (UI)
+│           ├── Program.cs                 # Entry point & DI setup
+│           ├── ConsoleHandler.cs          # Console command handling
+│           ├── ConsoleHelper.cs           # Console UI utilities
+│           └── appsettings.json          # Configuration
+│
+└── tests/
+    ├── Unit/                              # Unit tests for Core
+    ├── Integration/                       # Integration tests for Adapters
+    └── E2E/                              # End-to-end tests
 ```
 
 ## Layer Responsibilities
 
-### Domain Layer (Core)
-**Purpose**: Contains enterprise-wide business rules and logic
+### Domain Layer (Inner Hexagon Core)
+**Location**: `src/Core/Domain`
+
+The heart of the application containing pure business logic with zero external dependencies.
 
 **Responsibilities**:
 - Define core business entities (Document, Template)
-- Define value objects (FilePath)
-- Define domain exceptions
-- Encapsulate business rules
-- No dependencies on other layers
+- Encapsulate business rules and invariants
+- Define value objects for type safety
+- Define domain-specific exceptions
+- Provide domain services for complex operations
 
-**Key Classes**:
+**Example**:
 ```csharp
-// Entity example
 public class Document
 {
-    public Guid Id { get; private set; }
-    public string FileName { get; private set; }
-    public DocumentStatus Status { get; private set; }
-    
-    // Business logic encapsulated
-    public void SetNormalizedContent(string content)
+    private Document(string fileName, string content, DocumentType type)
     {
-        // Business rules here
+        Id = Guid.NewGuid();
+        FileName = fileName ?? throw new ArgumentNullException(nameof(fileName));
+        OriginalContent = content ?? throw new ArgumentNullException(nameof(content));
+        Type = type;
+        Status = DocumentStatus.Created;
+        CreatedAt = DateTime.UtcNow;
     }
-}
 
-// Value Object example
-public record FilePath
-{
-    public string Value { get; }
-    
-    public FilePath(string value)
+    public static Document Create(string fileName, string content, DocumentType type)
     {
-        // Validation logic
-        Value = value;
+        // Business rule: File name must have an extension
+        if (!Path.HasExtension(fileName))
+            throw new InvalidDocumentFormatException("Document must have a file extension");
+
+        return new Document(fileName, content, type);
+    }
+
+    public void SetNormalizedContent(string normalizedContent)
+    {
+        // Business rule: Can only normalize if not already processed
+        if (Status != DocumentStatus.Created)
+            throw new DocumentProcessingException("Document has already been processed");
+
+        NormalizedContent = normalizedContent;
+        Status = DocumentStatus.Normalized;
+        ProcessedAt = DateTime.UtcNow;
     }
 }
 ```
 
-### Application Layer
-**Purpose**: Contains application-specific business rules
+### Application Layer (Hexagon Boundary)
+**Location**: `src/Core/Application`
+
+Orchestrates the application flow and defines the ports (interfaces) that adapters must implement.
 
 **Responsibilities**:
-- Orchestrate domain objects
-- Implement use cases
-- Define interfaces for external dependencies
-- Data transformation (DTOs)
-- Input validation
+- Define use cases as application services
+- Define ports (interfaces) for external dependencies
+- Orchestrate domain objects to fulfill use cases
+- Transform data between domain and external world (DTOs)
+- Implement application-specific business rules
 
-**Key Components**:
+**Port Example**:
 ```csharp
-// Service interface
-public interface IDocumentService
+// This is a PORT - defines what the application needs from the outside world
+public interface IDocumentReader
 {
-    Task<DocumentDto> NormalizeDocumentAsync(NormalizeDocumentRequest request);
+    Task<bool> IsSupportedAsync(string filePath);
+    Task<string> ReadDocumentAsync(string filePath);
+    DocumentType GetDocumentType();
 }
 
-// Implementation with orchestration
+// Another PORT for AI normalization
+public interface INormalizationService
+{
+    Task<string> NormalizeDocumentAsync(
+        string content, 
+        string templateContent, 
+        CancellationToken cancellationToken = default);
+}
+```
+
+**Use Case Example**:
+```csharp
 public class DocumentService : IDocumentService
 {
-    // Orchestrates multiple dependencies to fulfill use case
+    private readonly IDocumentRepository _documentRepository;
+    private readonly ITemplateRepository _templateRepository;
+    private readonly INormalizationService _normalizationService;
+    private readonly IDocumentReader _documentReader;
+    private readonly IDocumentWriter _documentWriter;
+
+    public async Task<DocumentDto> NormalizeDocumentAsync(NormalizeDocumentRequest request)
+    {
+        // 1. Read the document using the appropriate adapter
+        var content = await _documentReader.ReadDocumentAsync(request.DocumentPath);
+        
+        // 2. Get the template
+        var template = await _templateRepository.GetByNameAsync(request.TemplateName);
+        
+        // 3. Create domain entity
+        var document = Document.Create(Path.GetFileName(request.DocumentPath), content, type);
+        
+        // 4. Normalize using AI adapter
+        var normalizedContent = await _normalizationService.NormalizeDocumentAsync(
+            content, template.Content);
+        
+        // 5. Update domain entity
+        document.SetNormalizedContent(normalizedContent);
+        
+        // 6. Save and return DTO
+        await _documentRepository.AddAsync(document);
+        return DocumentDto.FromEntity(document);
+    }
 }
 ```
 
-### Infrastructure Layer
-**Purpose**: Implements external concerns
+### Infrastructure Layer (Adapters)
+**Location**: `src/Adapters/Infrastructure`
+
+Implements the ports defined by the application layer, connecting to external systems.
+
+**Adapter Categories**:
+
+1. **AI Adapters** - Connect to AI services
+   ```csharp
+   public class SemanticKernelService : INormalizationService
+   {
+       // Implements the port using Semantic Kernel
+       public async Task<string> NormalizeDocumentAsync(...)
+       {
+           // Actual implementation using Semantic Kernel
+       }
+   }
+   ```
+
+2. **Document Processing Adapters** - Handle file I/O
+   ```csharp
+   public class AsposePdfReader : IDocumentReader
+   {
+       // Implements the port using Aspose.PDF
+       public async Task<string> ReadDocumentAsync(string filePath)
+       {
+           // Actual PDF reading implementation
+       }
+   }
+   ```
+
+3. **Repository Adapters** - Handle data persistence
+   ```csharp
+   public class InMemoryDocumentRepository : IDocumentRepository
+   {
+       // Implements the port using in-memory storage
+   }
+   ```
+
+### CLI Layer (Driving Adapter)
+**Location**: `src/Adapters/CLI`
+
+The user interface adapter that drives the application.
 
 **Responsibilities**:
-- Implement interfaces defined in Application layer
-- External service integration (OpenAI, Aspose)
-- Data persistence
-- File system operations
-- Third-party library wrappers
+- Handle user input/output
+- Configure dependency injection
+- Map user commands to application use cases
+- Present results to users
 
-**Key Implementations**:
-- `SemanticKernelService`: OpenAI integration
-- `AsposeDocumentWriter`: Document generation
-- `InMemoryDocumentRepository`: Data persistence
+## Ports and Adapters
 
-### Presentation Layer
-**Purpose**: Handle user interaction
+### Ports (Interfaces)
 
-**Responsibilities**:
-- User input/output
-- Input formatting
-- Error presentation
-- Progress reporting
+Ports define the contracts between the hexagon and the outside world:
+
+**Driven Ports** (Application → Infrastructure):
+- `IDocumentReader` - Reading various document formats
+- `IDocumentWriter` - Writing documents in different formats
+- `IDocumentRepository` - Persisting documents
+- `ITemplateRepository` - Managing templates
+- `INormalizationService` - AI normalization
+- `IOutputValidator` - Validating generated documents
+
+**Driving Ports** (CLI → Application):
+- `IDocumentService` - Main document operations
+- `IDocumentValidator` - Validation operations
+
+### Adapters (Implementations)
+
+**Driven Adapters** (Infrastructure):
+- `SemanticKernelService` → `INormalizationService`
+- `AsposePdfReader` → `IDocumentReader`
+- `AsposeDocumentWriter` → `IDocumentWriter`
+- `InMemoryDocumentRepository` → `IDocumentRepository`
+
+**Driving Adapters** (CLI):
+- `ConsoleHandler` - Processes console commands
+- `Program.cs` - Configures DI and starts application
 
 ## Core Components
 
-### 1. Document Processing Pipeline
+### Document Processing Pipeline
 
 ```
-Input Document → Reader → Normalization → Template Application → Writer → Output
+┌─────────┐    ┌────────┐    ┌──────────────┐    ┌──────────┐    ┌────────┐    ┌────────┐
+│  Input  │───▶│ Reader │───▶│Normalization │───▶│ Template │───▶│ Writer │───▶│ Output │
+│Document │    │Adapter │    │   Service    │    │Application│   │Adapter │    │Document│
+└─────────┘    └────────┘    └──────────────┘    └──────────┘    └────────┘    └────────┘
 ```
 
-**Components**:
-- `IDocumentReader`: Abstracts document reading
-- `CompositeDocumentReader`: Implements composite pattern for multiple readers
-- `INormalizationService`: AI-powered content normalization
-- `IDocumentWriter`: Abstracts document writing
+### Composite Document Reader
 
-### 2. Template System
-
-**Components**:
-- `Template`: Domain entity representing a document template
-- `ITemplateRepository`: Template storage abstraction
-- Template placeholders: `{{field_name}}` syntax
-
-### 3. Validation System
-
-**Components**:
-- `IDocumentValidator`: Input validation
-- `IOutputValidator`: Output quality validation
-- `Result<T>`: Functional error handling
-
-## Design Patterns
-
-### 1. Repository Pattern
-**Purpose**: Abstract data persistence
-
-```csharp
-public interface IDocumentRepository
-{
-    Task<Document?> GetByIdAsync(Guid id);
-    Task AddAsync(Document document);
-}
-```
-
-### 2. Composite Pattern
-**Used in**: `CompositeDocumentReader`
+Uses the Composite pattern to support multiple document formats:
 
 ```csharp
 public class CompositeDocumentReader : IDocumentReader
 {
     private readonly IEnumerable<IDocumentReader> _readers;
-    
+
     public async Task<string> ReadDocumentAsync(string filePath)
     {
-        var reader = _readers.FirstOrDefault(r => r.IsSupported(filePath));
-        return await reader.ReadDocumentAsync(filePath);
+        var supportedReader = _readers.FirstOrDefault(r => 
+            r.IsSupportedAsync(filePath).Result);
+            
+        if (supportedReader == null)
+            throw new InvalidDocumentFormatException($"No reader available for {filePath}");
+            
+        return await supportedReader.ReadDocumentAsync(filePath);
     }
 }
 ```
 
-### 3. Strategy Pattern
-**Used in**: Document readers/writers for different formats
+## Design Patterns
 
-### 4. Result Pattern
-**Purpose**: Functional error handling without exceptions
+### 1. Hexagonal Architecture Pattern
+The overarching pattern that structures the entire application.
 
+### 2. Repository Pattern
+Abstracts data persistence behind interfaces:
+```csharp
+public interface IDocumentRepository
+{
+    Task<Document?> GetByIdAsync(Guid id);
+    Task<IEnumerable<Document>> GetAllAsync();
+    Task AddAsync(Document document);
+    Task UpdateAsync(Document document);
+}
+```
+
+### 3. Composite Pattern
+Used in `CompositeDocumentReader` to handle multiple document formats.
+
+### 4. Strategy Pattern
+Different readers/writers act as strategies for document processing.
+
+### 5. Result Pattern
+Functional error handling without exceptions:
 ```csharp
 public class Result<T>
 {
     public bool IsSuccess { get; }
     public T? Value { get; }
-    public string Error { get; }
+    public string? Error { get; }
+    
+    public static Result<T> Success(T value) => new(true, value, null);
+    public static Result<T> Failure(string error) => new(false, default, error);
 }
 ```
 
-### 5. Options Pattern
-**Purpose**: Strongly-typed configuration
+### 6. Dependency Injection
+Used throughout for loose coupling and testability.
 
+### 7. Options Pattern
+For strongly-typed configuration:
 ```csharp
-services.AddOptions<ApplicationOptions>()
-    .Bind(configuration.GetSection("Application"))
-    .ValidateDataAnnotations();
+services.Configure<ApplicationOptions>(
+    configuration.GetSection(ApplicationOptions.SectionName));
 ```
-
-### 6. Plugin Pattern
-**Used in**: Semantic Kernel plugins for AI functionality
 
 ## Dependency Flow
 
+### Inward Dependencies Only
+
 ```
-Presentation → Application → Domain
-     ↓             ↓
-     └─────→ Infrastructure
+External World → Adapters → Application → Domain
+                    ↓           ↓           ↓
+                   Port      Use Case    Pure Logic
+                (Interface)  (Service)   (No Dependencies)
 ```
 
-- **Inward Dependencies**: Dependencies point inward toward the domain
-- **No Outward Dependencies**: Domain has no dependencies
-- **Interface Segregation**: Small, focused interfaces
+**Key Rules**:
+1. Domain has NO external dependencies
+2. Application depends only on Domain
+3. Infrastructure depends on Application (implements ports)
+4. CLI depends on Application (uses ports)
+5. Dependencies always point inward
 
-## Coding Conventions
-
-### Naming Conventions
-
-1. **Interfaces**: Prefix with 'I'
-   ```csharp
-   public interface IDocumentService { }
-   ```
-
-2. **Async Methods**: Suffix with 'Async'
-   ```csharp
-   public async Task<Document> GetDocumentAsync() { }
-   ```
-
-3. **Private Fields**: Prefix with underscore
-   ```csharp
-   private readonly ILogger<DocumentService> _logger;
-   ```
-
-4. **Constants**: PascalCase
-   ```csharp
-   public const string SectionName = "Application";
-   ```
-
-### File Organization
-
-1. **One Type Per File**: Each class/interface in its own file
-2. **Folder Structure Mirrors Namespace**: Consistent organization
-3. **Related Types Grouped**: Exceptions, DTOs, etc. in dedicated folders
-
-### Code Style
-
-1. **Explicit Access Modifiers**: Always specify public/private
-2. **Readonly Fields**: Use readonly for injected dependencies
-3. **Expression-Bodied Members**: For simple properties/methods
-4. **Target-Typed New**: Use when type is obvious
-   ```csharp
-   List<string> items = new();
-   ```
-
-## Error Handling Strategy
-
-### 1. Domain Exceptions
-Custom exceptions for domain-specific errors:
+### Dependency Injection Configuration
 
 ```csharp
-public abstract class DomainException : Exception
-{
-    public string Code { get; }
-}
+// In Program.cs
+services.AddScoped<IDocumentService, DocumentService>();
+services.AddScoped<IDocumentReader, CompositeDocumentReader>();
+services.AddScoped<INormalizationService, SemanticKernelService>();
+services.AddScoped<IDocumentRepository, InMemoryDocumentRepository>();
 ```
-
-### 2. Exception Hierarchy
-```
-Exception
-└── DomainException
-    ├── DocumentNotFoundException
-    ├── InvalidDocumentFormatException
-    ├── TemplateNotFoundException
-    └── NormalizationException
-```
-
-### 3. Error Handling Layers
-
-- **Domain**: Throws domain exceptions for business rule violations
-- **Application**: Catches and logs exceptions, returns Result<T>
-- **Infrastructure**: Wraps external exceptions in domain exceptions
-- **Presentation**: Displays user-friendly error messages
-
-## Logging Architecture
-
-### 1. Structured Logging with Serilog
-
-```csharp
-_logger.LogInformation("Document processed {DocumentId} in {Duration}ms", 
-    documentId, duration);
-```
-
-### 2. Log Levels
-- **Debug**: Detailed execution flow
-- **Information**: Key operations
-- **Warning**: Non-critical issues
-- **Error**: Exceptions and failures
-- **Fatal**: Application crashes
-
-### 3. Log Enrichment
-- Timestamp
-- Log level
-- Source context
-- Exception details
-
-## Configuration Management
-
-### 1. Configuration Sources
-1. `appsettings.json`: Default configuration
-2. Environment variables: Override settings
-3. Command-line arguments: Runtime overrides
-
-### 2. Configuration Validation
-```csharp
-services.AddOptions<ApplicationOptions>()
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
-```
-
-### 3. Configuration Sections
-- `OpenAI`: AI service settings
-- `Application`: General application settings
-- `Serilog`: Logging configuration
-
-## Security Considerations
-
-### 1. Input Validation
-- File size limits
-- Extension whitelist
-- Path traversal prevention
-- Content validation
-
-### 2. Sensitive Data
-- API keys in configuration (not in code)
-- No logging of sensitive information
-- Secure file operations
-
-### 3. Dependency Security
-- Regular package updates
-- Security scanning
-- License compliance
-
-## Performance Considerations
-
-### 1. Async/Await
-- All I/O operations are async
-- Proper cancellation token usage
-- No blocking calls
-
-### 2. Resource Management
-- Proper disposal with `using` statements
-- Stream processing for large files
-- Memory-efficient document processing
-
-### 3. Caching Strategy
-- Template caching (future enhancement)
-- Configuration caching
-- Compiled regex patterns
 
 ## Testing Strategy
 
-### 1. Unit Tests
-**Focus**: Domain logic and application services
+### Unit Tests (Core)
+Test domain logic and application services in isolation:
 
 ```csharp
 [Fact]
-public void Document_SetNormalizedContent_UpdatesStatus()
+public void Document_Create_WithInvalidFileName_ThrowsException()
 {
-    // Arrange
-    var document = Document.Create("test.pdf", "content");
-    
-    // Act
-    document.SetNormalizedContent("normalized");
-    
-    // Assert
-    Assert.Equal(DocumentStatus.Normalized, document.Status);
+    // Arrange & Act & Assert
+    Assert.Throws<InvalidDocumentFormatException>(() => 
+        Document.Create("fileWithoutExtension", "content", DocumentType.Text));
 }
 ```
 
-### 2. Integration Tests
-**Focus**: Infrastructure components
+### Integration Tests (Adapters)
+Test adapter implementations:
 
 ```csharp
 [Fact]
 public async Task AsposePdfReader_ReadDocument_ReturnsContent()
 {
-    // Test actual PDF reading
+    // Test actual PDF reading with Aspose
 }
 ```
 
-### 3. Validation Tests
-**Focus**: End-to-end document processing
+### E2E Tests
+Test complete workflows:
+
+```csharp
+[Fact]
+public async Task NormalizeDocument_CompleteWorkflow_Success()
+{
+    // Test from console input to final output
+}
+```
+
+## Error Handling
+
+### Domain Exceptions
+```
+DomainException (Base)
+├── DocumentNotFoundException
+├── InvalidDocumentFormatException
+├── DocumentProcessingException
+├── TemplateNotFoundException
+└── NormalizationException
+```
+
+### Error Flow
+1. Domain throws specific exceptions
+2. Application catches and logs
+3. Infrastructure wraps external exceptions
+4. CLI presents user-friendly messages
+
+## Configuration Management
+
+### Configuration Structure
+```json
+{
+  "Application": {
+    "DefaultOutputDirectory": "output",
+    "MaxFileSizeMB": 50
+  },
+  "SemanticKernel": {
+    "Provider": "OpenAI",
+    "ApiKey": "{{API_KEY}}",
+    "Model": "gpt-4"
+  }
+}
+```
+
+### Configuration Flow
+1. CLI loads configuration
+2. Passes to DI container
+3. Injected into services via Options pattern
 
 ## Future Extensibility
 
-### 1. New Document Formats
-1. Create new reader implementing `IDocumentReader`
-2. Register in DI container
-3. No changes to existing code
+### Adding New Document Format
 
-### 2. New AI Providers
-1. Create new implementation of `INormalizationService`
-2. Swap implementation in DI
+1. Create new reader implementing `IDocumentReader`:
+```csharp
+public class ExcelReader : IDocumentReader
+{
+    public Task<bool> IsSupportedAsync(string filePath) => 
+        Task.FromResult(Path.GetExtension(filePath) == ".xlsx");
+        
+    public async Task<string> ReadDocumentAsync(string filePath)
+    {
+        // Excel reading logic
+    }
+}
+```
 
-### 3. New Storage Options
-1. Implement `IDocumentRepository` for database
-2. Configure in DI
+2. Register in DI:
+```csharp
+services.AddScoped<IDocumentReader, ExcelReader>();
+```
 
-### 4. API Addition
-1. Add new Web API project
-2. Reuse Application layer services
-3. No changes to business logic
+No changes needed in core business logic!
 
-### 5. Batch Processing
-1. Add new service for batch operations
-2. Leverage existing document processing
-3. Add queuing infrastructure
+### Adding New AI Provider
 
-## Best Practices
+1. Create new implementation of `INormalizationService`:
+```csharp
+public class AnthropicService : INormalizationService
+{
+    public async Task<string> NormalizeDocumentAsync(...)
+    {
+        // Anthropic API implementation
+    }
+}
+```
 
-### 1. SOLID Principles
-- **S**: Single Responsibility
-- **O**: Open/Closed
-- **L**: Liskov Substitution
-- **I**: Interface Segregation
-- **D**: Dependency Inversion
+2. Replace registration in DI:
+```csharp
+services.AddScoped<INormalizationService, AnthropicService>();
+```
 
-### 2. DRY (Don't Repeat Yourself)
-- Shared logic in base classes
-- Common functionality in helpers
-- Reusable components
+### Adding Database Persistence
 
-### 3. YAGNI (You Aren't Gonna Need It)
-- Don't over-engineer
-- Build what's needed now
-- Design for extensibility
+1. Create new repository implementation:
+```csharp
+public class SqlDocumentRepository : IDocumentRepository
+{
+    // SQL implementation
+}
+```
 
-### 4. Clean Code
-- Meaningful names
-- Small, focused methods
-- Clear intent
-- Minimal comments (code should be self-documenting)
+2. Replace in-memory with SQL:
+```csharp
+services.AddScoped<IDocumentRepository, SqlDocumentRepository>();
+```
+
+### Adding Web API
+
+1. Create new Web API project
+2. Reference Application project
+3. Create controllers that use `IDocumentService`
+4. No changes to business logic required!
 
 ## Conclusion
 
-The PDF Template CLI architecture provides a solid foundation for a maintainable, testable, and extensible application. By following Clean Architecture principles and established design patterns, the codebase remains flexible and adaptable to changing requirements while maintaining a clear separation of concerns.
+The Hexagonal Architecture provides PDF Template CLI with a robust, maintainable, and extensible foundation. The clear separation between business logic and technical details ensures that the application can evolve with changing requirements while maintaining its core integrity. The architecture makes it easy to test, modify, and extend the application without affecting existing functionality.
