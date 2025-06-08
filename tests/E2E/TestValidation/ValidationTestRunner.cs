@@ -91,10 +91,15 @@ public class ValidationTestRunner
     
     public async Task RunAllTestsAsync()
     {
-        var testCases = GetTestCases();
+        // Create timestamped output directory
+        var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        var sessionOutputDir = CreateSessionOutputDirectory(timestamp);
+        
+        var testCases = GetTestCases(sessionOutputDir);
         var results = new List<TestResult>();
         
-        Console.WriteLine("Starting validation tests...\n");
+        Console.WriteLine($"Starting validation tests...");
+        Console.WriteLine($"Output directory: {sessionOutputDir}\n");
         
         foreach (var testCase in testCases)
         {
@@ -112,7 +117,7 @@ public class ValidationTestRunner
         }
         
         // Generate summary
-        GenerateSummary(results);
+        GenerateSummary(results, sessionOutputDir);
     }
     
     private async Task<TestResult> RunSingleTestAsync(TestCase testCase)
@@ -153,7 +158,24 @@ public class ValidationTestRunner
         }
     }
     
-    private List<TestCase> GetTestCases()
+    private string CreateSessionOutputDirectory(string timestamp)
+    {
+        var currentDir = Directory.GetCurrentDirectory();
+        var baseOutputDir = Path.Combine(currentDir, "tests", "E2E", "test-outputs");
+        
+        // If running from E2E directory, adjust path
+        if (!Directory.Exists(Path.GetDirectoryName(baseOutputDir)))
+        {
+            baseOutputDir = "test-outputs";
+        }
+        
+        var sessionDir = Path.Combine(baseOutputDir, $"run_{timestamp}");
+        Directory.CreateDirectory(sessionDir);
+        
+        return sessionDir;
+    }
+    
+    private List<TestCase> GetTestCases(string outputDir)
     {
         // Determine the fixtures base path
         var currentDir = Directory.GetCurrentDirectory();
@@ -164,13 +186,6 @@ public class ValidationTestRunner
         {
             fixturesPath = Path.Combine(currentDir, "Fixtures");
         }
-        
-        var outputDir = Path.Combine(currentDir, "tests", "E2E", "test-outputs");
-        if (!Directory.Exists(Path.GetDirectoryName(outputDir)))
-        {
-            outputDir = "test-outputs";
-        }
-        Directory.CreateDirectory(outputDir);
         
         return new List<TestCase>
         {
@@ -209,7 +224,7 @@ public class ValidationTestRunner
         };
     }
     
-    private void GenerateSummary(List<TestResult> results)
+    private void GenerateSummary(List<TestResult> results, string outputDir)
     {
         var validResults = results.Where(r => r.ValidationResult != null).ToList();
         
@@ -239,20 +254,31 @@ public class ValidationTestRunner
                 passed = r.Success,
                 confidence = r.ValidationResult?.ConfidenceScore,
                 issues = r.ValidationResult?.Issues.Count ?? 0,
-                summary = r.ValidationResult?.Summary ?? r.Error
+                summary = r.ValidationResult?.Summary ?? r.Error,
+                llmResponse = r.ValidationResult?.RawLlmResponse,
+                validationDetails = r.ValidationResult != null ? new
+                {
+                    isValid = r.ValidationResult.IsValid,
+                    recommendation = r.ValidationResult.Recommendation,
+                    extractedFields = r.ValidationResult.ExtractedFields,
+                    allIssues = r.ValidationResult.Issues
+                } : null
             })
         };
         
         var json = JsonSerializer.Serialize(fullReport, new JsonSerializerOptions { WriteIndented = true });
-        // Save summary to correct location
-        var currentDir = Directory.GetCurrentDirectory();
-        var summaryPath = Path.Combine(currentDir, "tests", "E2E", "validation-summary.json");
-        if (!Directory.Exists(Path.GetDirectoryName(summaryPath)))
-        {
-            summaryPath = "validation-summary.json";
-        }
         
+        // Save summary to the session output directory
+        var summaryPath = Path.Combine(outputDir, "validation-summary.json");
         File.WriteAllText(summaryPath, json);
+        
+        // Also save to the legacy location for backward compatibility
+        var currentDir = Directory.GetCurrentDirectory();
+        var legacyPath = Path.Combine(currentDir, "tests", "E2E", "validation-summary.json");
+        if (Directory.Exists(Path.GetDirectoryName(legacyPath)))
+        {
+            File.WriteAllText(legacyPath, json);
+        }
         
         Console.WriteLine("\n=== TEST SUMMARY ===");
         Console.WriteLine($"Total: {fullReport.summary.totalTests}");

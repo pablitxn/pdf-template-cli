@@ -24,14 +24,8 @@ if ([string]::IsNullOrWhiteSpace($apiKey)) {
     }
 }
 
-# Clean previous test outputs
-Write-Host "🧹 Cleaning previous test outputs..." -ForegroundColor Gray
-if (Test-Path "tests\E2E\test-outputs") {
-    Remove-Item -Path "tests\E2E\test-outputs" -Recurse -Force
-}
-if (Test-Path "tests\E2E\validation-summary.json") {
-    Remove-Item -Path "tests\E2E\validation-summary.json" -Force
-}
+# Note: We're not cleaning test-outputs anymore since we're using timestamped folders
+Write-Host "📁 Test outputs will be saved in timestamped folder..." -ForegroundColor Gray
 
 # Build the E2E test project
 Write-Host "🔨 Building E2E test project..." -ForegroundColor Gray

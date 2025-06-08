@@ -9,6 +9,7 @@ public class ValidationResult
     public Dictionary<string, string> ExtractedFields { get; set; } = new();
     public string Recommendation { get; set; } = string.Empty;
     public DateTime ValidatedAt { get; set; } = DateTime.UtcNow;
+    public string? RawLlmResponse { get; set; } // Raw response from the LLM for debugging
 }
 
 public class ValidationIssue

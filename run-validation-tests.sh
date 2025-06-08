@@ -26,10 +26,8 @@ if [ -z "$API_KEY" ]; then
     fi
 fi
 
-# Clean previous test outputs
-echo "🧹 Cleaning previous test outputs..."
-rm -rf tests/E2E/test-outputs
-rm -f tests/E2E/validation-summary.json
+# Note: We're not cleaning test-outputs anymore since we're using timestamped folders
+echo "📁 Test outputs will be saved in timestamped folder..."
 
 # Build the E2E test project
 echo "🔨 Building E2E test project..."

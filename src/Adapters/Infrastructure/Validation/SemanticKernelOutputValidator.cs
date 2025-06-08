@@ -104,7 +104,21 @@ Consider:
                 prompt, 
                 new KernelArguments(executionSettings), 
                 cancellationToken: cancellationToken);
-            var jsonResponse = response.ToString();
+            var rawResponse = response.ToString();
+            
+            // Clean the response - remove markdown code blocks if present
+            var jsonResponse = rawResponse;
+            if (jsonResponse.Contains("```json"))
+            {
+                jsonResponse = jsonResponse.Substring(jsonResponse.IndexOf("```json") + 7);
+                jsonResponse = jsonResponse.Substring(0, jsonResponse.LastIndexOf("```"));
+            }
+            else if (jsonResponse.Contains("```"))
+            {
+                jsonResponse = jsonResponse.Substring(jsonResponse.IndexOf("```") + 3);
+                jsonResponse = jsonResponse.Substring(0, jsonResponse.LastIndexOf("```"));
+            }
+            jsonResponse = jsonResponse.Trim();
             
             // Parse the JSON response
             var validationResult = JsonSerializer.Deserialize<ValidationResult>(jsonResponse, new JsonSerializerOptions
@@ -113,6 +127,7 @@ Consider:
             }) ?? new ValidationResult { IsValid = false, Summary = "Failed to parse validation response" };
             
             validationResult.ValidatedAt = DateTime.UtcNow;
+            validationResult.RawLlmResponse = rawResponse;
             return validationResult;
         }
         catch (Exception ex)
