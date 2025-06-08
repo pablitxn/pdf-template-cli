@@ -177,13 +177,54 @@ Edit `src/Adapters/CLI/appsettings.json` to customize behavior:
 The tool includes a comprehensive validation system powered by AI:
 
 - **Input Validation**: File size, format, and content checks
-- **Output Validation**: AI-powered verification of generated documents
-- **Batch Testing**: Automated validation of multiple documents
+- **Output Validation**: AI-powered verification of generated documents using GPT-4
+- **Batch Testing**: Automated validation of multiple documents with fixtures
+- **Confidence Scoring**: Each validation includes a confidence score (0-100%)
+- **Detailed Issue Reporting**: Identifies missing fields, formatting issues, and content accuracy
 
-Run validation tests:
+### Running Validation Tests
+
+From the project root, use the provided scripts:
+
+**Linux/macOS:**
+```bash
+./run-validation-tests.sh
+```
+
+**Windows:**
+```powershell
+.\run-validation-tests.ps1
+```
+
+**Or run directly:**
 ```bash
 dotnet run --project tests/E2E/E2E.csproj
 ```
+
+### Validation Process
+
+1. **Fixture Processing**: The system processes all test documents in `tests/E2E/Fixtures/user-data/documents/`
+2. **Template Application**: Each document is paired with an appropriate template
+3. **AI Validation**: GPT-4 analyzes the output to ensure:
+   - All information from the original document is preserved
+   - The template structure is properly followed
+   - No hallucinations or incorrect data
+   - Professional formatting is maintained
+4. **Report Generation**: Creates a detailed `validation-summary.json` with:
+   - Pass/fail status for each test
+   - Confidence scores
+   - Specific issues found
+   - Recommendations for improvement
+
+### Test Fixtures
+
+The E2E tests include various real-world scenarios:
+- **Legal**: Unformatted contracts → Legal contract templates
+- **Business**: Messy invoices → Professional invoice templates  
+- **Medical**: Patient notes → Medical report templates
+- **Technical**: Project updates → Technical report templates
+
+⚠️ **Note**: Ensure your OpenAI API key is configured in `src/Adapters/CLI/appsettings.json` before running validation tests.
 
 ## 🏗️ Architecture
 
